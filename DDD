@@ -1,0 +1,81 @@
+import json
+from typing import List, Tuple, Union, Optional
+from pathlib import Path
+
+class SimpleMatrixSerializer:
+    
+    @staticmethod
+    def serialize(matrix: List[List[float]], filename: str) -> None:
+        
+        if not all(len(row) == len(matrix[0]) for row in matrix):
+            raise ValueError("Все строки матрицы должны иметь одинаковую длину")
+        
+        with open(filename, 'w') as f:
+            rows = len(matrix)
+            cols = len(matrix[0])
+            f.write(f"{rows} {cols}\n")
+            
+            for row in matrix:
+                line = ' '.join(str(val) for val in row)
+                f.write(f"{line}\n")
+    
+    @staticmethod
+    def deserialize(filename: str) -> List[List[float]]:
+
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+        
+        rows, cols = map(int, lines[0].strip().split())
+        
+        matrix = []
+        for i in range(1, rows + 1):
+            row = list(map(float, lines[i].strip().split()))
+            matrix.append(row)
+        
+        return matrix
+    
+    @staticmethod
+    def serialize_json(matrix: List[List[float]], filename: str) -> None:
+        """Сериализует матрицу в JSON формате"""
+        with open(filename, 'w') as f:
+            json.dump(matrix, f, indent=2)
+    
+    @staticmethod
+    def deserialize_json(filename: str) -> List[List[float]]:
+        """Десериализует матрицу из JSON формата"""
+        with open(filename, 'r') as f:
+            return json.load(f)
+
+
+def simple_example():
+    matrix = [
+        [1.0, 2.0, 3.0],
+        [4.0, 5.0, 6.0],
+        [7.0, 8.0, 9.0]
+    ]
+    
+    print("Сериализация матрицы...")
+    
+    SimpleMatrixSerializer.serialize(matrix, "simple_matrix.txt")
+    print("✓ Матрица сохранена в simple_matrix.txt")
+    
+    SimpleMatrixSerializer.serialize_json(matrix, "simple_matrix.json")
+    print("✓ Матрица сохранена в simple_matrix.json")
+    
+    loaded_txt = SimpleMatrixSerializer.deserialize("simple_matrix.txt")
+    loaded_json = SimpleMatrixSerializer.deserialize_json("simple_matrix.json")
+    
+    print(f"\nЗагружена матрица из TXT: {loaded_txt}")
+    print(f"Загружена матрица из JSON: {loaded_json}")
+    
+    print("\n--- Содержимое simple_matrix.txt ---")
+    with open("simple_matrix.txt", "r") as f:
+        print(f.read())
+    
+    print("\n--- Содержимое simple_matrix.json ---")
+    with open("simple_matrix.json", "r") as f:
+        print(f.read())
+
+
+if __name__ == "__main__":
+    simple_example()
