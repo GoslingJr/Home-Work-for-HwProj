@@ -1,0 +1,95 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Run tests
+      run: |
+        python test_huffman.py
+    
+    - name: Test basic functionality
+      run: |
+        python -c "
+from huffman import encode, decode
+text = 'test huffman coding'
+encoded, table = encode(text)
+decoded = decode(encoded, table)
+assert text == decoded, 'Encoding/decoding failed'
+print('✓ Basic test passed')
+        "
+    
+    - name: Test with different inputs
+      run: |
+        python -c "
+from huffman import encode, decode
+test_cases = [
+    '',
+    'a',
+    'aa',
+    'ab',
+    'hello world',
+    'привет мир',
+    '1234567890',
+    '!@#$%^&*()'
+]
+for text in test_cases:
+    encoded, table = encode(text)
+    decoded = decode(encoded, table)
+    assert text == decoded, f'Failed for: {text}'
+print('✓ All test cases passed')
+        "
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Run example
+      run: |
+        python example.py
+    
+    - name: Create test files
+      run: |
+        echo "This is a test file for Huffman coding." > test_input.txt
+        echo "Multiple lines of text." >> test_input.txt
+        echo "With different characters: 123 !@# ABC" >> test_input.txt
+    
+    - name: Test file operations
+      run: |
+        python -c "
+import os
+from huffman import encode_file, decode_file
+encode_file('test_input.txt', 'test_encoded.huff')
+decode_file('test_encoded.huff', 'test_output.txt')
+with open('test_input.txt', 'r') as f1, open('test_output.txt', 'r') as f2:
+    assert f1.read() == f2.read(), 'File compression/decompression failed'
+print('✓ File operations test passed')
+os.remove('test_input.txt')
+os.remove('test_encoded.huff')
+os.remove('test_output.txt')
+        "
