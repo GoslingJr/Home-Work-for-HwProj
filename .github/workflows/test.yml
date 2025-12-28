@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          
+      - name: Check structure
+        run: |
+          echo "Структура репозитория:"
+          find . -name "*.py" | head -20
+          echo ""
+          echo "Содержимое src/:"
+          ls -la src/ || echo "Папка src не найдена"
+          
+      - name: Run simple test
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'src')
+          try:
+              from heapsort import heapsort
+              print('Импорт heapsort успешен')
+              
+              # Простой тест
+              test_data = [3, 1, 4, 1, 5, 9, 2, 6]
+              result = heapsort(test_data.copy())
+              expected = sorted(test_data)
+              
+              if result == expected:
+                  print(f'Тест пройден: {test_data} -> {result}')
+              else:
+                  print(f'Тест не пройден: {result} != {expected}')
+          except Exception as e:
+              print(f'Ошибка: {e}')
+          "
