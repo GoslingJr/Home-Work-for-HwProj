@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10)
+project(MultiplePrograms)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
+
+add_executable(Fast src/Fast.c)
+add_executable(Lucky src/Lucky.c)
+add_executable(Reverse src/Reverse.c)
+add_executable(Ophat src/Ophat.c)
