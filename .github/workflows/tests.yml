@@ -33,7 +33,7 @@ text = 'test huffman coding'
 encoded, table = encode(text)
 decoded = decode(encoded, table)
 assert text == decoded, 'Encoding/decoding failed'
-print('✓ Basic test passed')
+print('Basic test passed')
         "
     
     - name: Test with different inputs
@@ -54,7 +54,7 @@ for text in test_cases:
     encoded, table = encode(text)
     decoded = decode(encoded, table)
     assert text == decoded, f'Failed for: {text}'
-print('✓ All test cases passed')
+print('All test cases passed')
         "
 
   integration-test:
