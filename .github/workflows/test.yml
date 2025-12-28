@@ -28,14 +28,16 @@ jobs:
 
     - name: Run unit tests
       run: |
-        python -m unittest test_heapsort.py -v
+        python -m unittest discover tests -v
 
     - name: Run property tests
       run: |
         python -c "
-          from hypothesis import given, strategies as st, settings
-          from heapsort import heapsort
           import sys
+          sys.path.insert(0, 'src')  # Добавляем папку src в путь поиска
+
+          from hypothesis import given, strategies as st, settings
+          from heapsort import heapsort  # Теперь файл найдётся в src/
 
           @given(st.lists(st.integers(), max_size=50))
           @settings(max_examples=20)
@@ -44,8 +46,8 @@ jobs:
 
           try:
             quick_test()
-            print('Property tests passed')
+            print('✓ Property tests passed')
           except Exception as e:
-            print(f'Property tests failed: {e}')
+            print(f'✗ Property tests failed: {e}')
             sys.exit(1)
-        "м
+        "
